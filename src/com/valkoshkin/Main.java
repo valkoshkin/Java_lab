@@ -23,7 +23,7 @@ public class Main {
             VehicleUtils.printModelsNamesWithPrices(car);
             System.out.println("\nAverage model price: " + VehicleUtils.getAveragePrice(car));
 
-            String carModelNameToDelete = "C12213";
+            String carModelNameToDelete = "C12";
             System.out.println("\nDelete model with name: " + carModelNameToDelete);
             car.deleteModel(carModelNameToDelete);
 
