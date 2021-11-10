@@ -1,2 +1,4 @@
 # Project exclude paths
 /out/
+/Java_lab.iml
+/.idea/
