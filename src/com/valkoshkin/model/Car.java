@@ -47,7 +47,11 @@ public class Car implements Vehicle {
 
     @Override
     public int getModelsLength() {
-        return models.length;
+        int existedModelsLength = 0;
+        for (Model model: models) {
+            if (model != null) existedModelsLength++;
+        }
+        return existedModelsLength;
     }
 
     @Override

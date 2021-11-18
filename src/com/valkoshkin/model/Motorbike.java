@@ -52,7 +52,7 @@ public class Motorbike implements Vehicle {
 
     @Override
     public int getModelsLength() {
-        return length;
+        return getExistedModelsLength();
     }
 
     @Override
