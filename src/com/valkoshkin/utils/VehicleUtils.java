@@ -58,8 +58,7 @@ public class VehicleUtils {
         for (double modelPrice : vehicle.getModelsPrices()) {
             stream.writeDouble(modelPrice);
         }
-
-        stream.close();
+        stream.flush();
     }
 
     public static Vehicle inputVehicle(InputStream in) throws IOException, DuplicateModelNameException {
@@ -88,8 +87,6 @@ public class VehicleUtils {
             vehicle.addModel(modelsNames[i], modelsPrices[i]);
         }
 
-        stream.close();
-
         return vehicle;
     }
 
@@ -112,8 +109,7 @@ public class VehicleUtils {
             if (i != vehicle.getModelsLength() - 1) modelsPricesBuilder.append(",");
         }
         writer.println(modelsPricesBuilder.toString());
-
-        writer.close();
+        writer.flush();
     }
 
     public static Vehicle readVehicle(Reader in) throws IOException, DuplicateModelNameException {
@@ -134,7 +130,6 @@ public class VehicleUtils {
             vehicle.addModel(modelsNames[i], modelsPrices[i]);
         }
 
-        reader.close();
         return vehicle;
     }
 
