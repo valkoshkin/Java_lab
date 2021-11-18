@@ -11,10 +11,12 @@ import com.valkoshkin.utils.VehicleUtils;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 
 public class Main {
 
-    public static final String filePath = "test-file.bin";
+    public static final String filePath = "test.file";
 
     public static void main(String[] args) {
         try {
@@ -23,9 +25,13 @@ public class Main {
             addCarModels(car);
             System.out.println("Original vehicle:\n");
             printVehicle(car);
-            System.out.println();
             VehicleUtils.setFactory(new CarFactory());
+
+            System.out.println();
             testByteStream(car);
+
+            System.out.println();
+            testCharacterStream(car);
 
             System.out.println("\n- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\n");
 
@@ -34,9 +40,13 @@ public class Main {
             addMotorbikeModels(motorbike);
             System.out.println("Original vehicle:\n");
             printVehicle(motorbike);
-            System.out.println();
             VehicleUtils.setFactory(new MotorbikeFactory());
+
+            System.out.println();
             testByteStream(motorbike);
+
+            System.out.println();
+            testCharacterStream(motorbike);
         } catch (DuplicateModelNameException | ModelPriceOutOfBoundsException e) {
             System.out.println(e.getMessage());
         }
@@ -59,9 +69,20 @@ public class Main {
     public static void testByteStream(Vehicle vehicle) {
         try {
             VehicleUtils.outputVehicle(vehicle, new FileOutputStream(filePath, false));
-            var vehicleFromInputStream = VehicleUtils.inputVehicle(new FileInputStream(filePath));
+            var vehicleFromByteStream = VehicleUtils.inputVehicle(new FileInputStream(filePath));
             System.out.println("Vehicle from byte stream:\n");
-            printVehicle(vehicleFromInputStream);
+            printVehicle(vehicleFromByteStream);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    public static void testCharacterStream(Vehicle vehicle) {
+        try {
+            VehicleUtils.writeVehicle(vehicle, new FileWriter(filePath, false));
+            var vehicleFromCharStream = VehicleUtils.readVehicle(new FileReader(filePath));
+            System.out.println("Vehicle from character stream:\n");
+            printVehicle(vehicleFromCharStream);
         } catch (Exception ex) {
             ex.printStackTrace();
         }

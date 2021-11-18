@@ -93,12 +93,49 @@ public class VehicleUtils {
         return vehicle;
     }
 
-//    public static void writeVehicle(Vehicle vehicle, Writer out) {
-//
-//    }
+    public static void writeVehicle(Vehicle vehicle, Writer out) {
+        var writer = new PrintWriter(out);
 
-//    public static Vehicle readVehicle(Reader in) {
-//
-//    }
+        writer.println(vehicle.getBrand());
+        writer.println(vehicle.getModelsLength());
+
+        StringBuilder modelsNamesBuilder = new StringBuilder();
+        for (int i = 0; i < vehicle.getModelsLength(); i++) {
+            modelsNamesBuilder.append(vehicle.getModelsNames()[i]);
+            if (i != vehicle.getModelsLength() - 1) modelsNamesBuilder.append(",");
+        }
+        writer.println(modelsNamesBuilder.toString());
+
+        StringBuilder modelsPricesBuilder = new StringBuilder();
+        for (int i = 0; i < vehicle.getModelsLength(); i++) {
+            modelsPricesBuilder.append(vehicle.getModelsPrices()[i]);
+            if (i != vehicle.getModelsLength() - 1) modelsPricesBuilder.append(",");
+        }
+        writer.println(modelsPricesBuilder.toString());
+
+        writer.close();
+    }
+
+    public static Vehicle readVehicle(Reader in) throws IOException, DuplicateModelNameException {
+        var reader = new BufferedReader(in);
+
+        var brand = reader.readLine();
+        var modelsLength = Integer.parseInt(reader.readLine());
+        var modelsNames = reader.readLine().split(",");
+
+        var modelsPricesRaw = reader.readLine().split(",");
+        double[] modelsPrices = new double[modelsLength];
+        for (int i = 0; i < modelsLength; i++) {
+            modelsPrices[i] = Double.parseDouble(modelsPricesRaw[i]);
+        }
+
+        var vehicle = VehicleUtils.vehicleFactory.createVehicle(brand, modelsLength);
+        for (int i = 0; i < modelsLength; i++) {
+            vehicle.addModel(modelsNames[i], modelsPrices[i]);
+        }
+
+        reader.close();
+        return vehicle;
+    }
 
 }
