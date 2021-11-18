@@ -4,6 +4,8 @@ import com.valkoshkin.exceptions.DuplicateModelNameException;
 import com.valkoshkin.exceptions.ModelPriceOutOfBoundsException;
 import com.valkoshkin.exceptions.NoSuchModelNameException;
 
+import java.io.Serializable;
+
 public class Motorbike implements Vehicle {
     private String brand;
     private int length;
@@ -161,7 +163,7 @@ public class Motorbike implements Vehicle {
         throw new NoSuchModelNameException(String.format("Model with name '%s' not found.", name));
     }
 
-    private class Model {
+    private class Model implements Serializable {
         String name = null;
         double price = Double.NaN;
         Model prev = null;

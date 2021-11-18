@@ -31,6 +31,9 @@ public class Main {
             testCharacterStream(car);
 
             System.out.println();
+            testSerialization(car);
+
+            System.out.println();
             testSystemStream();
 
             System.out.println("\n- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\n");
@@ -47,6 +50,9 @@ public class Main {
 
             System.out.println();
             testCharacterStream(motorbike);
+
+            System.out.println();
+            testSerialization(motorbike);
 
             System.out.println();
             testSystemStream();
@@ -67,6 +73,13 @@ public class Main {
         vehicle.addModel("R-8", 542);
         vehicle.addModel("ZX-2", 712);
         vehicle.addModel("T-41", 404);
+    }
+
+    public static void printVehicle(Vehicle vehicle) {
+        System.out.println("Brand: " + vehicle.getBrand());
+        System.out.println("Models length: " + vehicle.getModelsLength());
+        System.out.println("Models:");
+        VehicleUtils.printModelsNamesWithPrices(vehicle);
     }
 
     public static void testByteStream(Vehicle vehicle) {
@@ -108,10 +121,15 @@ public class Main {
         }
     }
 
-    public static void printVehicle(Vehicle vehicle) {
-        System.out.println("Brand: " + vehicle.getBrand());
-        System.out.println("Models length: " + vehicle.getModelsLength());
-        System.out.println("Models:");
-        VehicleUtils.printModelsNamesWithPrices(vehicle);
+    public static void testSerialization(Vehicle vehicle) {
+        try (var fileOutputStream = new FileOutputStream(filePath, false);
+             var fileInputStream = new FileInputStream(filePath)) {
+            VehicleUtils.serializeVehicle(vehicle, fileOutputStream);
+            var deserializedVehicle = VehicleUtils.deserializeVehicle(fileInputStream);
+            System.out.println("Deserialized vehicle:\n");
+            printVehicle(deserializedVehicle);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 }

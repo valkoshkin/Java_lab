@@ -4,6 +4,7 @@ import com.valkoshkin.exceptions.DuplicateModelNameException;
 import com.valkoshkin.exceptions.ModelPriceOutOfBoundsException;
 import com.valkoshkin.exceptions.NoSuchModelNameException;
 
+import java.io.Serializable;
 import java.util.Arrays;
 
 public class Car implements Vehicle {
@@ -156,7 +157,7 @@ public class Car implements Vehicle {
         }
     }
 
-    private class Model {
+    private class Model implements Serializable {
         private String name;
         private double price;
 

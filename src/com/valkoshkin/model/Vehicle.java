@@ -3,7 +3,9 @@ package com.valkoshkin.model;
 import com.valkoshkin.exceptions.DuplicateModelNameException;
 import com.valkoshkin.exceptions.NoSuchModelNameException;
 
-public interface Vehicle {
+import java.io.Serializable;
+
+public interface Vehicle extends Serializable {
     String getBrand();
     void setBrand(String brand);
     int getModelsLength();

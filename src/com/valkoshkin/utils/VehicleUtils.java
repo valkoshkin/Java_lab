@@ -133,4 +133,14 @@ public class VehicleUtils {
         return vehicle;
     }
 
+    public static void serializeVehicle(Vehicle vehicle, OutputStream out) throws IOException {
+        var stream = new ObjectOutputStream(out);
+        stream.writeObject(vehicle);
+        stream.flush();
+    }
+
+    public static Vehicle deserializeVehicle(InputStream in) throws IOException, ClassNotFoundException {
+        var stream = new ObjectInputStream(in);
+        return (Vehicle) stream.readObject();
+    }
 }
