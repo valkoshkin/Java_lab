@@ -2,70 +2,61 @@ package com.valkoshkin;
 
 import com.valkoshkin.exceptions.DuplicateModelNameException;
 import com.valkoshkin.exceptions.ModelPriceOutOfBoundsException;
-import com.valkoshkin.exceptions.NoSuchModelNameException;
+import com.valkoshkin.factory.CarFactory;
+import com.valkoshkin.factory.MotorbikeFactory;
 import com.valkoshkin.model.Car;
 import com.valkoshkin.model.Motorbike;
 import com.valkoshkin.model.Vehicle;
 import com.valkoshkin.utils.VehicleUtils;
 
+import java.io.*;
+
 public class Main {
+
+    public static final String filePath = "test.file";
 
     public static void main(String[] args) {
         try {
-            Vehicle car = new Car("BMW", 0);
-            Vehicle motorbike = new Motorbike("Yamaha", 2);
-
             System.out.println("[Car]\n");
+            Vehicle car = new Car("BMW", 2);
             addCarModels(car);
-            System.out.println("Brand: " + car.getBrand());
-            System.out.println("\nModels length: " + car.getModelsLength());
-            System.out.println("Models:");
-            VehicleUtils.printModelsNamesWithPrices(car);
-            System.out.println("\nAverage model price: " + VehicleUtils.getAveragePrice(car));
+            System.out.println("Original vehicle:\n");
+            printVehicle(car);
+            VehicleUtils.setFactory(new CarFactory());
 
-            String carModelNameToDelete = "C12";
-            System.out.println("\nDelete model with name: " + carModelNameToDelete);
-            car.deleteModel(carModelNameToDelete);
+            System.out.println();
+            testByteStream(car);
 
-            String carModelNameToGetPrice = "A3";
-            System.out.printf("\nPrice of '%s' model: %f\n", carModelNameToGetPrice, car.getModelPriceByName(carModelNameToGetPrice));
-            car.getModelPriceByName(carModelNameToGetPrice);
+            System.out.println();
+            testCharacterStream(car);
 
-            double carNewModelPrice = 999.09;
-            System.out.printf("\nUpdate '%s' model price to price %f.\n", carModelNameToGetPrice, carNewModelPrice);
-            car.setModelPriceByName(carModelNameToGetPrice, carNewModelPrice);
+            System.out.println();
+            testSerialization(car);
 
-            System.out.println("\nModels length: " + car.getModelsLength());
-            System.out.println("Models:");
-            VehicleUtils.printModelsNamesWithPrices(car);
+            System.out.println();
+            testSystemStream();
 
             System.out.println("\n- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\n");
 
             System.out.println("[Motorbike]\n");
-
+            Vehicle motorbike = new Motorbike("Yamaha", 2);
             addMotorbikeModels(motorbike);
-            System.out.println("Brand: " + motorbike.getBrand());
-            System.out.println("\nModels length: " + motorbike.getModelsLength());
-            System.out.println("Models:");
-            VehicleUtils.printModelsNamesWithPrices(motorbike);
-            System.out.println("\nAverage model price: " + VehicleUtils.getAveragePrice(motorbike));
+            System.out.println("Original vehicle:\n");
+            printVehicle(motorbike);
+            VehicleUtils.setFactory(new MotorbikeFactory());
 
-            String bikeModelNameToDelete = "R-8";
-            System.out.println("\nDelete model with name: " + bikeModelNameToDelete);
-            motorbike.deleteModel(bikeModelNameToDelete);
+            System.out.println();
+            testByteStream(motorbike);
 
-            String bikeModelNameToGetPrice = "T-41";
-            System.out.printf("\nPrice of '%s' model: %f\n", bikeModelNameToGetPrice, motorbike.getModelPriceByName(bikeModelNameToGetPrice));
-            motorbike.getModelPriceByName(bikeModelNameToGetPrice);
+            System.out.println();
+            testCharacterStream(motorbike);
 
-            String bikeNewModelName = "NT-94";
-            System.out.printf("\nUpdate '%s' model name to '%s'.\n", bikeModelNameToGetPrice, bikeNewModelName);
-            motorbike.setModelNameByName(bikeModelNameToGetPrice, bikeNewModelName);
+            System.out.println();
+            testSerialization(motorbike);
 
-            System.out.println("\nModels length: " + motorbike.getModelsLength());
-            System.out.println("Models:");
-            VehicleUtils.printModelsNamesWithPrices(motorbike);
-        } catch (NoSuchModelNameException | DuplicateModelNameException | ModelPriceOutOfBoundsException e) {
+            System.out.println();
+            testSystemStream();
+        } catch (DuplicateModelNameException | ModelPriceOutOfBoundsException e) {
             System.out.println(e.getMessage());
         }
     }
@@ -82,5 +73,63 @@ public class Main {
         vehicle.addModel("R-8", 542);
         vehicle.addModel("ZX-2", 712);
         vehicle.addModel("T-41", 404);
+    }
+
+    public static void printVehicle(Vehicle vehicle) {
+        System.out.println("Brand: " + vehicle.getBrand());
+        System.out.println("Models length: " + vehicle.getModelsLength());
+        System.out.println("Models:");
+        VehicleUtils.printModelsNamesWithPrices(vehicle);
+    }
+
+    public static void testByteStream(Vehicle vehicle) {
+        try (var fileOutputStream = new FileOutputStream(filePath, false);
+             var fileInputStream = new FileInputStream(filePath)) {
+            VehicleUtils.outputVehicle(vehicle, fileOutputStream);
+            var vehicleFromByteStream = VehicleUtils.inputVehicle(fileInputStream);
+            System.out.println("Vehicle from byte stream:\n");
+            printVehicle(vehicleFromByteStream);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    public static void testCharacterStream(Vehicle vehicle) {
+        try (var fileWriter = new FileWriter(filePath, false);
+             var fileReader = new FileReader(filePath)) {
+            VehicleUtils.writeVehicle(vehicle, fileWriter);
+            var vehicleFromCharStream = VehicleUtils.readVehicle(fileReader);
+            System.out.println("Vehicle from character stream:\n");
+            printVehicle(vehicleFromCharStream);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    public static void testSystemStream() {
+        try {
+            System.out.println("Enter vehicle data in next format:\nBrand\nNumber of models\nModels' names (separator - ',')\nModels' prices (separator - ',')\n");
+            var vehicleFromConsole = VehicleUtils.readVehicle(new InputStreamReader(System.in));
+            System.out.println("\nVehicle from console (RAW):\n");
+            VehicleUtils.writeVehicle(vehicleFromConsole, new OutputStreamWriter(System.out));
+            System.out.println("\nVehicle from console:\n");
+            printVehicle(vehicleFromConsole);
+        } catch (ArrayIndexOutOfBoundsException e) {
+            System.err.println("\nThe number of models' names or prices entered is less than the number of models.");
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    public static void testSerialization(Vehicle vehicle) {
+        try (var fileOutputStream = new FileOutputStream(filePath, false);
+             var fileInputStream = new FileInputStream(filePath)) {
+            VehicleUtils.serializeVehicle(vehicle, fileOutputStream);
+            var deserializedVehicle = VehicleUtils.deserializeVehicle(fileInputStream);
+            System.out.println("Deserialized vehicle:\n");
+            printVehicle(deserializedVehicle);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 }
