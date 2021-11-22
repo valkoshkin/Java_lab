@@ -1,19 +1,14 @@
 package com.valkoshkin;
 
 import com.valkoshkin.exceptions.DuplicateModelNameException;
-import com.valkoshkin.exceptions.ModelPriceOutOfBoundsException;
-import com.valkoshkin.factory.CarFactory;
-import com.valkoshkin.factory.MotorbikeFactory;
 import com.valkoshkin.model.Car;
 import com.valkoshkin.model.Motorbike;
 import com.valkoshkin.model.Vehicle;
+import com.valkoshkin.threads.PrintNamesThread;
+import com.valkoshkin.threads.PrintPricesThread;
 import com.valkoshkin.utils.VehicleUtils;
 
-import java.io.*;
-
 public class Main {
-
-    public static final String filePath = "test.file";
 
     public static void main(String[] args) {
         try {
@@ -22,19 +17,9 @@ public class Main {
             addCarModels(car);
             System.out.println("Original vehicle:\n");
             printVehicle(car);
-            VehicleUtils.setFactory(new CarFactory());
 
-            System.out.println();
-            testByteStream(car);
-
-            System.out.println();
-            testCharacterStream(car);
-
-            System.out.println();
-            testSerialization(car);
-
-            System.out.println();
-            testSystemStream();
+            System.out.println("\nTest 'Thread' class successors (Task 1):");
+            testThreadSuccessors(car);
 
             System.out.println("\n- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\n");
 
@@ -43,20 +28,10 @@ public class Main {
             addMotorbikeModels(motorbike);
             System.out.println("Original vehicle:\n");
             printVehicle(motorbike);
-            VehicleUtils.setFactory(new MotorbikeFactory());
 
-            System.out.println();
-            testByteStream(motorbike);
-
-            System.out.println();
-            testCharacterStream(motorbike);
-
-            System.out.println();
-            testSerialization(motorbike);
-
-            System.out.println();
-            testSystemStream();
-        } catch (DuplicateModelNameException | ModelPriceOutOfBoundsException e) {
+            System.out.println("\nTest 'Thread' class successors (Task 1):");
+            testThreadSuccessors(motorbike);
+        } catch (Exception e) {
             System.out.println(e.getMessage());
         }
     }
@@ -82,54 +57,21 @@ public class Main {
         VehicleUtils.printModelsNamesWithPrices(vehicle);
     }
 
-    public static void testByteStream(Vehicle vehicle) {
-        try (var fileOutputStream = new FileOutputStream(filePath, false);
-             var fileInputStream = new FileInputStream(filePath)) {
-            VehicleUtils.outputVehicle(vehicle, fileOutputStream);
-            var vehicleFromByteStream = VehicleUtils.inputVehicle(fileInputStream);
-            System.out.println("Vehicle from byte stream:\n");
-            printVehicle(vehicleFromByteStream);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-    }
+    public static void testThreadSuccessors(Vehicle vehicle) {
+        PrintPricesThread printPricesThread = new PrintPricesThread(vehicle);
+        PrintNamesThread printNamesThread = new PrintNamesThread(vehicle);
 
-    public static void testCharacterStream(Vehicle vehicle) {
-        try (var fileWriter = new FileWriter(filePath, false);
-             var fileReader = new FileReader(filePath)) {
-            VehicleUtils.writeVehicle(vehicle, fileWriter);
-            var vehicleFromCharStream = VehicleUtils.readVehicle(fileReader);
-            System.out.println("Vehicle from character stream:\n");
-            printVehicle(vehicleFromCharStream);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-    }
+        printPricesThread.setPriority(Thread.MAX_PRIORITY);
+        printNamesThread.setPriority(Thread.MIN_PRIORITY);
 
-    public static void testSystemStream() {
+        printPricesThread.start();
+        printNamesThread.start();
+
         try {
-            System.out.println("Enter vehicle data in next format:\nBrand\nNumber of models\nModels' names (separator - ',')\nModels' prices (separator - ',')\n");
-            var vehicleFromConsole = VehicleUtils.readVehicle(new InputStreamReader(System.in));
-            System.out.println("\nVehicle from console (RAW):\n");
-            VehicleUtils.writeVehicle(vehicleFromConsole, new OutputStreamWriter(System.out));
-            System.out.println("\nVehicle from console:\n");
-            printVehicle(vehicleFromConsole);
-        } catch (ArrayIndexOutOfBoundsException e) {
-            System.err.println("\nThe number of models' names or prices entered is less than the number of models.");
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-    }
-
-    public static void testSerialization(Vehicle vehicle) {
-        try (var fileOutputStream = new FileOutputStream(filePath, false);
-             var fileInputStream = new FileInputStream(filePath)) {
-            VehicleUtils.serializeVehicle(vehicle, fileOutputStream);
-            var deserializedVehicle = VehicleUtils.deserializeVehicle(fileInputStream);
-            System.out.println("Deserialized vehicle:\n");
-            printVehicle(deserializedVehicle);
-        } catch (Exception ex) {
-            ex.printStackTrace();
+            printPricesThread.join();
+            printNamesThread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 }

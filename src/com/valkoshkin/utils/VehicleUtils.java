@@ -28,7 +28,7 @@ public class VehicleUtils {
     public static void printModelsNames(Vehicle vehicle) {
         String[] modelsNames = vehicle.getModelsNames();
         for (int i = 0; i < vehicle.getModelsLength(); i++) {
-            System.out.printf("%d. %s", i + 1, modelsNames[i]);
+            System.out.printf("%d. %s%n", i + 1, modelsNames[i]);
         }
     }
 
