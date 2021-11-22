@@ -4,8 +4,7 @@ import com.valkoshkin.exceptions.DuplicateModelNameException;
 import com.valkoshkin.model.Car;
 import com.valkoshkin.model.Motorbike;
 import com.valkoshkin.model.Vehicle;
-import com.valkoshkin.threads.PrintNamesThread;
-import com.valkoshkin.threads.PrintPricesThread;
+import com.valkoshkin.threads.*;
 import com.valkoshkin.utils.VehicleUtils;
 
 public class Main {
@@ -18,8 +17,11 @@ public class Main {
             System.out.println("Original vehicle:\n");
             printVehicle(car);
 
-            System.out.println("\nTest 'Thread' class successors (Task 1):");
-            testThreadSuccessors(car);
+            System.out.println("\nTest 'Thread' priorities (Task 1):");
+            testThreadPriorities(car);
+
+            System.out.println("\nTest synchronizer (Task 2):");
+            testSynchronizer(car);
 
             System.out.println("\n- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\n");
 
@@ -30,7 +32,10 @@ public class Main {
             printVehicle(motorbike);
 
             System.out.println("\nTest 'Thread' class successors (Task 1):");
-            testThreadSuccessors(motorbike);
+            testThreadPriorities(motorbike);
+
+            System.out.println("\nTest synchronizer (Task 2):");
+            testSynchronizer(motorbike);
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
@@ -57,12 +62,28 @@ public class Main {
         VehicleUtils.printModelsNamesWithPrices(vehicle);
     }
 
-    public static void testThreadSuccessors(Vehicle vehicle) {
-        PrintPricesThread printPricesThread = new PrintPricesThread(vehicle);
-        PrintNamesThread printNamesThread = new PrintNamesThread(vehicle);
+    public static void testThreadPriorities(Vehicle vehicle) {
+        var printPricesThread = new PrintPricesThread(vehicle);
+        var printNamesThread = new PrintNamesThread(vehicle);
 
         printPricesThread.setPriority(Thread.MAX_PRIORITY);
         printNamesThread.setPriority(Thread.MIN_PRIORITY);
+
+        printPricesThread.start();
+        printNamesThread.start();
+
+        try {
+            printPricesThread.join();
+            printNamesThread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void testSynchronizer(Vehicle vehicle) {
+        var synchronizer = new VehicleSynchronizer(vehicle);
+        var printPricesThread = new Thread(new PrintPricesRunnable(synchronizer));
+        var printNamesThread = new Thread(new PrintNamesRunnable(synchronizer));
 
         printPricesThread.start();
         printNamesThread.start();
