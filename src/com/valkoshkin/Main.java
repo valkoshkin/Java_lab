@@ -4,6 +4,8 @@ import com.valkoshkin.exceptions.DuplicateModelNameException;
 import com.valkoshkin.model.Car;
 import com.valkoshkin.model.Motorbike;
 import com.valkoshkin.model.Vehicle;
+import com.valkoshkin.multithreading.lock.PrintNamesWithLock;
+import com.valkoshkin.multithreading.lock.PrintPricesWithLock;
 import com.valkoshkin.multithreading.synchronizer.PrintNamesWithSynchronizer;
 import com.valkoshkin.multithreading.synchronizer.PrintPricesWithSynchronizer;
 import com.valkoshkin.multithreading.synchronizer.VehicleSynchronizer;
@@ -29,6 +31,9 @@ public class Main {
             System.out.println("\nTest synchronizer (Task 2):");
             testSynchronizer(car);
 
+            System.out.println("\nTest lock (Task 3):");
+            testLock(car);
+
             System.out.println("\n- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\n");
 
             System.out.println("[Motorbike]\n");
@@ -42,6 +47,9 @@ public class Main {
 
             System.out.println("\nTest synchronizer (Task 2):");
             testSynchronizer(motorbike);
+
+            System.out.println("\nTest lock (Task 3):");
+            testLock(motorbike);
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
@@ -104,5 +112,17 @@ public class Main {
 
     public static void testLock(Vehicle vehicle) {
         var reentrantLock = new ReentrantLock();
+        var printNamesThread = new Thread(new PrintNamesWithLock(vehicle, reentrantLock));
+        var printPricesThread = new Thread(new PrintPricesWithLock(vehicle, reentrantLock));
+
+        printNamesThread.start();
+        printPricesThread.start();
+
+        try {
+            printNamesThread.join();
+            printPricesThread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 }
