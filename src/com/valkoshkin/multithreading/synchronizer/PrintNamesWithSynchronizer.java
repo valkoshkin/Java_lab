@@ -1,9 +1,9 @@
-package com.valkoshkin.threads;
+package com.valkoshkin.multithreading.synchronizer;
 
-public class PrintNamesRunnable implements Runnable {
+public class PrintNamesWithSynchronizer implements Runnable {
     private final VehicleSynchronizer synchronizer;
 
-    public PrintNamesRunnable(VehicleSynchronizer synchronizer) {
+    public PrintNamesWithSynchronizer(VehicleSynchronizer synchronizer) {
         this.synchronizer = synchronizer;
     }
 

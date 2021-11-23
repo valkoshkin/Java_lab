@@ -1,4 +1,4 @@
-package com.valkoshkin.threads;
+package com.valkoshkin.multithreading.threads;
 
 import com.valkoshkin.model.Vehicle;
 import com.valkoshkin.utils.VehicleUtils;

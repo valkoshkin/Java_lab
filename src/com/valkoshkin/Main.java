@@ -4,8 +4,14 @@ import com.valkoshkin.exceptions.DuplicateModelNameException;
 import com.valkoshkin.model.Car;
 import com.valkoshkin.model.Motorbike;
 import com.valkoshkin.model.Vehicle;
-import com.valkoshkin.threads.*;
+import com.valkoshkin.multithreading.synchronizer.PrintNamesWithSynchronizer;
+import com.valkoshkin.multithreading.synchronizer.PrintPricesWithSynchronizer;
+import com.valkoshkin.multithreading.synchronizer.VehicleSynchronizer;
+import com.valkoshkin.multithreading.threads.PrintNamesThread;
+import com.valkoshkin.multithreading.threads.PrintPricesThread;
 import com.valkoshkin.utils.VehicleUtils;
+
+import java.util.concurrent.locks.ReentrantLock;
 
 public class Main {
 
@@ -82,8 +88,8 @@ public class Main {
 
     public static void testSynchronizer(Vehicle vehicle) {
         var synchronizer = new VehicleSynchronizer(vehicle);
-        var printPricesThread = new Thread(new PrintPricesRunnable(synchronizer));
-        var printNamesThread = new Thread(new PrintNamesRunnable(synchronizer));
+        var printPricesThread = new Thread(new PrintPricesWithSynchronizer(synchronizer));
+        var printNamesThread = new Thread(new PrintNamesWithSynchronizer(synchronizer));
 
         printPricesThread.start();
         printNamesThread.start();
@@ -94,5 +100,9 @@ public class Main {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+    }
+
+    public static void testLock(Vehicle vehicle) {
+        var reentrantLock = new ReentrantLock();
     }
 }
