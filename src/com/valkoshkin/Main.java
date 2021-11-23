@@ -6,6 +6,7 @@ import com.valkoshkin.model.Motorbike;
 import com.valkoshkin.model.Vehicle;
 import com.valkoshkin.multithreading.lock.PrintNamesWithLock;
 import com.valkoshkin.multithreading.lock.PrintPricesWithLock;
+import com.valkoshkin.multithreading.pool.PrintBrandNameRunnable;
 import com.valkoshkin.multithreading.synchronizer.PrintNamesWithSynchronizer;
 import com.valkoshkin.multithreading.synchronizer.PrintPricesWithSynchronizer;
 import com.valkoshkin.multithreading.synchronizer.VehicleSynchronizer;
@@ -13,6 +14,7 @@ import com.valkoshkin.multithreading.threads.PrintNamesThread;
 import com.valkoshkin.multithreading.threads.PrintPricesThread;
 import com.valkoshkin.utils.VehicleUtils;
 
+import java.util.concurrent.Executors;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class Main {
@@ -50,6 +52,9 @@ public class Main {
 
             System.out.println("\nTest lock (Task 3):");
             testLock(motorbike);
+
+            System.out.println("\nTest thread pool (Task 4):");
+            testThreadPool();
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
@@ -124,5 +129,19 @@ public class Main {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+    }
+
+    public static void testThreadPool() {
+        var firstCar = new Car("AUDI", 1);
+        var secondCar = new Car("Tesla", 1);
+        var firstBike = new Motorbike("Suzuki", 1);
+        var secondBike = new Motorbike("Kawasaki", 1);
+
+        var executorService = Executors.newFixedThreadPool(2);
+        executorService.submit(new PrintBrandNameRunnable(firstCar));
+        executorService.submit(new PrintBrandNameRunnable(secondCar));
+        executorService.submit(new PrintBrandNameRunnable(firstBike));
+        executorService.submit(new PrintBrandNameRunnable(secondBike));
+        executorService.shutdown();
     }
 }
