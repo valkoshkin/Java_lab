@@ -1,9 +1,11 @@
 package com.valkoshkin;
 
 import com.valkoshkin.exceptions.DuplicateModelNameException;
+import com.valkoshkin.factory.CarFactory;
 import com.valkoshkin.model.Car;
 import com.valkoshkin.model.Motorbike;
 import com.valkoshkin.model.Vehicle;
+import com.valkoshkin.multithreading.queue.ReadBrandFromFile;
 import com.valkoshkin.multithreading.lock.PrintNamesWithLock;
 import com.valkoshkin.multithreading.lock.PrintPricesWithLock;
 import com.valkoshkin.multithreading.pool.PrintBrandNameRunnable;
@@ -14,7 +16,9 @@ import com.valkoshkin.multithreading.threads.PrintNamesThread;
 import com.valkoshkin.multithreading.threads.PrintPricesThread;
 import com.valkoshkin.utils.VehicleUtils;
 
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class Main {
@@ -53,8 +57,14 @@ public class Main {
             System.out.println("\nTest lock (Task 3):");
             testLock(motorbike);
 
-            System.out.println("\nTest thread pool (Task 4):");
+            System.out.println("\n- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\n");
+
+            System.out.println("Test thread pool (Task 4):");
             testThreadPool();
+
+            VehicleUtils.setVehicleFactory(new CarFactory());
+            System.out.println("\nTest blocking queue (Task 5):");
+            testBlockingQueue();
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
@@ -142,6 +152,29 @@ public class Main {
         executorService.submit(new PrintBrandNameRunnable(secondCar));
         executorService.submit(new PrintBrandNameRunnable(firstBike));
         executorService.submit(new PrintBrandNameRunnable(secondBike));
+
         executorService.shutdown();
+        try {
+            executorService.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void testBlockingQueue() {
+        var blockingQueue = new ArrayBlockingQueue<Vehicle>(2);
+        String[] filesNames = {"brand1.txt", "brand2.txt", "brand3.txt", "brand4.txt", "brand5.txt"};
+
+        for (var name : filesNames) {
+            new Thread(new ReadBrandFromFile(name, blockingQueue)).start();
+        }
+
+        for (int i = 0; i < 5; i++) {
+            try {
+                System.out.println(blockingQueue.take().getBrand());
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }
