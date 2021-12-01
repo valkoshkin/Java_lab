@@ -9,6 +9,14 @@ import java.io.*;
 public class VehicleUtils {
     private static VehicleFactory vehicleFactory;
 
+    public static void setVehicleFactory(VehicleFactory vehicleFactory) {
+        VehicleUtils.vehicleFactory = vehicleFactory;
+    }
+
+    public static VehicleFactory getVehicleFactory() {
+        return vehicleFactory;
+    }
+
     public static double getAveragePrice(Vehicle vehicle) {
         double sum = 0;
         for (double price : vehicle.getModelsPrices()) {
@@ -28,7 +36,7 @@ public class VehicleUtils {
     public static void printModelsNames(Vehicle vehicle) {
         String[] modelsNames = vehicle.getModelsNames();
         for (int i = 0; i < vehicle.getModelsLength(); i++) {
-            System.out.printf("%d. %s", i + 1, modelsNames[i]);
+            System.out.printf("%d. %s%n", i + 1, modelsNames[i]);
         }
     }
 
@@ -37,10 +45,6 @@ public class VehicleUtils {
         for (int i = 0; i < vehicle.getModelsLength(); i++) {
             System.out.printf("%d. %f%n", i + 1, modelsPrices[i]);
         }
-    }
-
-    public static void setFactory(VehicleFactory vehicleFactory) {
-        VehicleUtils.vehicleFactory = vehicleFactory;
     }
 
     // brandLength: int + brand: byte[] + modelsLength: int +
