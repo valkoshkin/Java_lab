@@ -22,6 +22,8 @@ public class Server {
                     out.writeDouble(averagePrice);
 
                     in.read();
+                } catch (Exception e) {
+                    e.printStackTrace();
                 } finally {
                     System.out.println("Client disconnected");
                 }
