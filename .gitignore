@@ -3,3 +3,7 @@
 /Java_lab.iml
 /.idea/
 /test.file
+/client/client.iml
+/common/common.iml
+/parallel-server/parallel-server.iml
+/server/server.iml
